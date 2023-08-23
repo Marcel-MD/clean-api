@@ -18,6 +18,7 @@ type UserService interface {
 	FindById(id string) (models.User, error)
 	Register(user models.RegisterUser) (models.Token, error)
 	Login(user models.LoginUser) (models.Token, error)
+	Delete(id string) error
 }
 
 func NewUserService(repository repositories.UserRepository, cfg config.Config) UserService {
@@ -89,7 +90,7 @@ func (s *userService) Login(user models.LoginUser) (models.Token, error) {
 		return token, err
 	}
 
-	err = s.verifyPassword(user.Password, existingUser.Password)
+	err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(user.Password))
 	if err != nil {
 		return token, err
 	}
@@ -104,6 +105,11 @@ func (s *userService) Login(user models.LoginUser) (models.Token, error) {
 	return token, nil
 }
 
-func (s *userService) verifyPassword(password, hashedPassword string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+func (s *userService) Delete(id string) error {
+	user, err := s.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	return s.repository.Delete(&user)
 }

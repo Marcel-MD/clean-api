@@ -44,8 +44,9 @@ func JwtAuthRoles(secret string, requiredRoles []string) gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+
 		if !contains(roles, requiredRoles) {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized, missing required role"})
 			ctx.Abort()
 			return
 		}

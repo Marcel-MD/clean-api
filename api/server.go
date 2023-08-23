@@ -7,6 +7,7 @@ import (
 	"github.com/Marcel-MD/clean-api/api/middleware"
 	"github.com/Marcel-MD/clean-api/config"
 	docs "github.com/Marcel-MD/clean-api/docs"
+	"github.com/Marcel-MD/clean-api/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -50,4 +51,7 @@ func registerUserRoutes(router *gin.RouterGroup, cfg config.Config, c controller
 
 	pr := r.Use(middleware.JwtAuth(cfg.ApiSecret))
 	pr.GET("/current", c.GetCurrent)
+
+	ar := r.Use(middleware.JwtAuthRoles(cfg.ApiSecret, []string{models.AdminRole}))
+	ar.DELETE("/:id", c.Delete)
 }

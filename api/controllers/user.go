@@ -15,6 +15,7 @@ type UserController interface {
 	GetCurrent(ctx *gin.Context)
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }
 
 func NewUserController(service services.UserService) UserController {
@@ -142,4 +143,25 @@ func (c *userController) Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, token)
+}
+
+// @Summary Delete user
+// @Description Delete user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "User ID"
+// @Success 200
+// @Router /users/{id} [delete]
+func (c *userController) Delete(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	err := c.service.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
