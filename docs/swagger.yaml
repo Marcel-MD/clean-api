@@ -118,6 +118,57 @@ paths:
       summary: Get user by ID
       tags:
       - users
+  /users/{id}/roles/{role}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove role from user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Remove role from user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Assign role to user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Assign role to user
+      tags:
+      - users
   /users/current:
     get:
       consumes:

@@ -54,4 +54,6 @@ func registerUserRoutes(router *gin.RouterGroup, cfg config.Config, c controller
 
 	ar := r.Use(middleware.JwtAuthRoles(cfg.ApiSecret, []string{models.AdminRole}))
 	ar.DELETE("/:id", c.Delete)
+	ar.PATCH("/:id/roles/:role", c.AssignRole)
+	ar.DELETE("/:id/roles/:role", c.RemoveRole)
 }

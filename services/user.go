@@ -19,6 +19,8 @@ type UserService interface {
 	Register(user models.RegisterUser) (models.Token, error)
 	Login(user models.LoginUser) (models.Token, error)
 	Delete(id string) error
+	AssignRole(id, role string) error
+	RemoveRole(id, role string) error
 }
 
 func NewUserService(repository repositories.UserRepository, cfg config.Config) UserService {
@@ -112,4 +114,37 @@ func (s *userService) Delete(id string) error {
 	}
 
 	return s.repository.Delete(&user)
+}
+
+func (s *userService) AssignRole(id, role string) error {
+	user, err := s.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	for _, r := range user.Roles {
+		if r == role {
+			return nil
+		}
+	}
+
+	user.Roles = append(user.Roles, role)
+
+	return s.repository.Update(&user)
+}
+
+func (s *userService) RemoveRole(id, role string) error {
+	user, err := s.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	for i, r := range user.Roles {
+		if r == role {
+			user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
+			break
+		}
+	}
+
+	return s.repository.Update(&user)
 }
