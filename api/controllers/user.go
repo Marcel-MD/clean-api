@@ -15,6 +15,7 @@ type UserController interface {
 	GetCurrent(ctx *gin.Context)
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	RefreshToken(ctx *gin.Context)
 	Delete(ctx *gin.Context)
 	AssignRole(ctx *gin.Context)
 	RemoveRole(ctx *gin.Context)
@@ -139,6 +140,31 @@ func (c *userController) Login(ctx *gin.Context) {
 	}
 
 	token, err := c.service.Login(user)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, token)
+}
+
+// @Summary Refresh token
+// @Description Refresh token
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param token body models.RefreshToken true "Refresh token"
+// @Success 200 {object} string
+// @Router /users/refresh [post]
+func (c *userController) RefreshToken(ctx *gin.Context) {
+	var refreshToken models.RefreshToken
+	err := ctx.BindJSON(&refreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := c.service.RefreshToken(refreshToken.Token)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return

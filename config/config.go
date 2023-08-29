@@ -14,9 +14,11 @@ type Config struct {
 	AllowOrigin string `env:"ALLOW_ORIGIN" envDefault:"*"`
 	Env         string `env:"ENV" envDefault:"dev"`
 
-	ApiSecret     string        `env:"API_SECRET" envDefault:"SecretSecretSecret"`
-	TokenLifespan time.Duration `env:"TOKEN_LIFESPAN" envDefault:"24h"`
-	DatabaseUrl   string        `env:"DATABASE_URL" envDefault:"postgres://postgres:password@postgres:5432/clean-api"`
+	AccessTokenSecret    string        `env:"ACCESS_TOKEN_SECRET" envDefault:"SecretAccessSecretAccess"`
+	AccessTokenLifespan  time.Duration `env:"ACCESS_TOKEN_LIFESPAN" envDefault:"1h"`
+	RefreshTokenSecret   string        `env:"REFRESH_TOKEN_SECRET" envDefault:"SecretRefreshSecretRefresh"`
+	RefreshTokenLifespan time.Duration `env:"REFRESH_TOKEN_LIFESPAN" envDefault:"72h"`
+	DatabaseUrl          string        `env:"DATABASE_URL" envDefault:"postgres://postgres:password@postgres:5432/clean-api"`
 }
 
 func NewConfig() (Config, error) {

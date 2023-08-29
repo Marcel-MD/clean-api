@@ -46,13 +46,14 @@ func registerUserRoutes(router *gin.RouterGroup, cfg config.Config, c controller
 	r := router.Group("/users")
 	r.POST("/register", c.Register)
 	r.POST("/login", c.Login)
+	r.POST("/refresh", c.RefreshToken)
 	r.GET("/", c.GetAll)
 	r.GET("/:id", c.GetById)
 
-	pr := r.Use(middleware.JwtAuth(cfg.ApiSecret))
+	pr := r.Use(middleware.JwtAuth(cfg.AccessTokenSecret))
 	pr.GET("/current", c.GetCurrent)
 
-	ar := r.Use(middleware.JwtAuthRoles(cfg.ApiSecret, []string{models.AdminRole}))
+	ar := r.Use(middleware.JwtAuthRoles(cfg.AccessTokenSecret, []string{models.AdminRole}))
 	ar.DELETE("/:id", c.Delete)
 	ar.PATCH("/:id/roles/:role", c.AssignRole)
 	ar.DELETE("/:id/roles/:role", c.RemoveRole)

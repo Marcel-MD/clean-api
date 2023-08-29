@@ -39,5 +39,11 @@ type LoginUser struct {
 }
 
 type Token struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	User         User   `json:"user"`
+}
+
+type RefreshToken struct {
 	Token string `json:"token"`
 }

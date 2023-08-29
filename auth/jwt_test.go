@@ -13,7 +13,7 @@ func TestGenerateJWT(t *testing.T) {
 	lifespan := time.Hour
 	secret := "mysecret"
 
-	token, err := GenerateJWT(userId, roles, lifespan, secret)
+	token, err := GenerateAccessToken(userId, roles, lifespan, secret)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -53,7 +53,7 @@ func TestExtractId(t *testing.T) {
 	lifespan := time.Hour
 	secret := "mysecret"
 
-	token, err := GenerateJWT(userId, roles, lifespan, secret)
+	token, err := GenerateAccessToken(userId, roles, lifespan, secret)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -79,7 +79,7 @@ func TestExtractIdAndRoles(t *testing.T) {
 	lifespan := time.Hour
 	secret := "mysecret"
 
-	token, err := GenerateJWT(userId, roles, lifespan, secret)
+	token, err := GenerateAccessToken(userId, roles, lifespan, secret)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

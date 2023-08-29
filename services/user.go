@@ -18,6 +18,7 @@ type UserService interface {
 	FindById(id string) (models.User, error)
 	Register(user models.RegisterUser) (models.Token, error)
 	Login(user models.LoginUser) (models.Token, error)
+	RefreshToken(refreshToken string) (models.Token, error)
 	Delete(id string) error
 	AssignRole(id, role string) error
 	RemoveRole(id, role string) error
@@ -74,12 +75,14 @@ func (s *userService) Register(user models.RegisterUser) (models.Token, error) {
 		return token, err
 	}
 
-	jwt, err := auth.GenerateJWT(newUser.ID, newUser.Roles, s.cfg.TokenLifespan, s.cfg.ApiSecret)
+	accessToken, refreshToken, err := auth.GenerateTokenPair(newUser.ID, newUser.Roles, s.cfg.AccessTokenLifespan, s.cfg.AccessTokenSecret, s.cfg.RefreshTokenSecret)
 	if err != nil {
 		return token, err
 	}
 
-	token.Token = jwt
+	token.Token = accessToken
+	token.RefreshToken = refreshToken
+	token.User = newUser
 
 	return token, nil
 }
@@ -97,12 +100,44 @@ func (s *userService) Login(user models.LoginUser) (models.Token, error) {
 		return token, err
 	}
 
-	jwt, err := auth.GenerateJWT(existingUser.ID, existingUser.Roles, s.cfg.TokenLifespan, s.cfg.ApiSecret)
+	accessToken, refreshToken, err := auth.GenerateTokenPair(existingUser.ID, existingUser.Roles, s.cfg.AccessTokenLifespan, s.cfg.AccessTokenSecret, s.cfg.RefreshTokenSecret)
 	if err != nil {
 		return token, err
 	}
 
-	token.Token = jwt
+	token.Token = accessToken
+	token.RefreshToken = refreshToken
+	token.User = existingUser
+
+	return token, nil
+}
+
+func (s *userService) RefreshToken(refreshToken string) (models.Token, error) {
+	var token models.Token
+
+	t, err := auth.Validate(refreshToken, s.cfg.RefreshTokenSecret)
+	if err != nil {
+		return token, err
+	}
+
+	uid, err := auth.ExtractId(t)
+	if err != nil {
+		return token, err
+	}
+
+	user, err := s.repository.FindById(uid)
+	if err != nil {
+		return token, err
+	}
+
+	accessToken, refreshToken, err := auth.GenerateTokenPair(user.ID, user.Roles, s.cfg.AccessTokenLifespan, s.cfg.AccessTokenSecret, s.cfg.RefreshTokenSecret)
+	if err != nil {
+		return token, err
+	}
+
+	token.Token = accessToken
+	token.RefreshToken = refreshToken
+	token.User = user
 
 	return token, nil
 }
